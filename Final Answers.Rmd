@@ -1,6 +1,6 @@
 ---
 title: "Predictive Modeling P2"
-author: "Eguche Emmanuella & Mervyn Jonathan Giritharn"
+author: "Eguche Emmanuella & Mervyn Jonathan Giritharan"
 date: "8/18/2020"
 output:
   html_document:
