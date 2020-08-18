@@ -1,0 +1,438 @@
+---
+title: "Predictive Modeling P2"
+author: "Eguche Emmanuella & Mervyn Jonathan Giritharn"
+date: "8/18/2020"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Green Buildings
+
+```{r load data 1, echo=FALSE}
+data = read.csv("greenbuilding.csv")
+```
+
+* Figure 1: Summary of Data Set
+
+```{r summary of data, echo=FALSE}
+summary(data)
+```
+
+* Before deleting any data points from the data set, a histogram was made for some variables to see the distribution shape of the data.
+
+* Figure 2: Histogram of Leasing_rate
+
+```{r leasing rate histogram, echo=FALSE}
+hist(data$leasing_rate)
+```
+
+* The leasing_rate histogram is skewed to the left, and there is a rise in number of leasing rates between 0% and 10%, which is located at the end of the skewed tail.
+
+```{r number of green building types, include=FALSE}
+greenbuildingsonly=subset(data, green_rating ==1)
+nrow(greenbuildingsonly)
+nrow(data)
+```
+
+* Out of 7894 locations, less than 10% of the total number of buildings are green buildings, so a histogram of green buildings' leasing_rates should be considered.
+
+* Figure 3: Histogram of Leasing_rate Conditional on green_rate
+
+```{r leasing rate histogram for green buildings, echo=FALSE}
+hist(data$leasing_rate[data$green_rating==1])
+```
+
+* Comparing Figure 2 to Figure 3, the data is still skewed to the left, but there is no rise in the number of leasing rates between 0% and 10% for green buildings.
+
+* Figure 4: Summary Statistics for Green Buildings
+
+```{r summary statistics for green buildings, echo=FALSE}
+summary(greenbuildingsonly)
+```
+
+```{r number of non green building types, include=FALSE}
+nongreenbuildingsonly=subset(data, green_rating ==0)
+```
+
+* Figure 5: Summary Statistics for Non Green Buildings
+
+```{r summary statistics for non green buildings, echo=FALSE}
+summary(nongreenbuildingsonly)
+```
+
+* Outliers can make the mean unreliable. However, the mean rent for green buildings is 30.02, and the median rent for green buildings is 27.6. The mean rent for non green buildings is 28.27, and the median rent for non green buildings is 25. Because the mean and median are not the same for green and non green buildings, the mean should be considered in the analysis, especially if the distribution of data is skewed to the left.
+
+* The worker suggested that a 250,000 square foot green building would generate more revenue than a non green building because the median rent is higher. This assumption is problematic. Green buildings have different costs than non green buildings, which would affect profitability. 
+
+* The worker assumes rent prices won't change over time. The age and class of a building effects revenue.
+
+# Question 2: ABIA
+
+```{r load data 2, echo=FALSE}
+abia <- read.csv("ABIA.csv")
+```
+
+* Figure 1: Summary Statistics for Each Variable
+
+```{r summary of data 2, echo=FALSE}
+summary(abia)
+```
+
+* The output above shows the minimum & maximum values, the median, and mean for each variable.
+
+* Figure 2: Logistic Regression Dependent-DepTime & Independent-Month, DayOfWeek, ArrTime, & Distance
+
+```{r logistic regression, echo=FALSE}
+logistic <- glm(abia$DepTime ~ abia$Month + abia$DayOfWeek + abia$ArrTime + abia$Distance)
+summary(logistic)
+```
+* P-values less than .05 are statistically significant to the logistic regresison model. All independent variables are statistically significant to the model.
+
+* Figure 3: Histogram of DepTime
+
+```{r histogram of deptime, echo=FALSE}
+hist(abia$DepTime)
+```
+* There aren't very many departures between 0 and 500. It is difficult to assume normality.
+
+##Q4
+
+## Market Segmentation
+
+I ran a PCA of TV Film and Sports Fandom
+
+```{r}
+sm = read.csv('social_marketing.csv')
+
+Z = sm[,c(7,8)]
+
+Z = scale(Z, center=TRUE, scale=FALSE)
+
+plot(Z)
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2))  
+
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3))
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+slope = v_try[2]/v_try[1]
+abline(0, slope)
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2)) 
+par(mfrow=c(1,2))
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3),
+     xlim=c(-2.5,2.5), ylim=c(-2.5,2.5))
+slope = v_try[2]/v_try[1]
+abline(0, slope)  
+
+
+alpha = Z %*% v_try  
+z_hat = alpha %*% v_try  
+points(z_hat, col='blue', pch=4)
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+hist(alpha, 25, xlim=c(-3,3), main=round(var(alpha), 2))
+
+
+```
+
+
+From the obtained data, we can say that around 3.68 people posted about both sports fandom and tv film. Perhaps they posted about their favorite sport movies.
+
+Then I ran a PCA between health nutrition and outdoors.
+
+```{r}
+sm = read.csv('social_marketing.csv')
+
+Z = sm[,c(17,24)]
+
+Z = scale(Z, center=TRUE, scale=FALSE)
+ 
+plot(Z)
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2))  
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3))
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+slope = v_try[2]/v_try[1]
+abline(0, slope)
+
+
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2)) 
+
+par(mfrow=c(1,2))
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3),
+     xlim=c(-2.5,2.5), ylim=c(-2.5,2.5))
+slope = v_try[2]/v_try[1]
+abline(0, slope) 
+
+
+alpha = Z %*% v_try  
+z_hat = alpha %*% v_try 
+points(z_hat, col='blue', pch=4)
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+hist(alpha, 25, xlim=c(-3,3), main=round(var(alpha), 2))
+
+
+```
+
+We observed that around 6.53 sent out a tweet relating to both health nutrition and outdoors. This is useful as NutrientH20 can focus on creating products relating to exercise and health. For instance, they could start working on a new energy drink.
+
+Then for my third PCA, I ran it between computer and business.
+```{r}
+
+sm = read.csv('social_marketing.csv')
+
+Z = sm[,c(22,23)]
+
+Z = scale(Z, center=TRUE, scale=FALSE)
+ 
+plot(Z)
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2))  
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3))
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+slope = v_try[2]/v_try[1]
+abline(0, slope)
+
+
+
+v_try = rnorm(2)
+v_try = v_try/sqrt(sum(v_try^2)) 
+
+par(mfrow=c(1,2))
+plot(Z, pch=19, col=rgb(0.3,0.3,0.3,0.3),
+     xlim=c(-2.5,2.5), ylim=c(-2.5,2.5))
+slope = v_try[2]/v_try[1]
+abline(0, slope) 
+
+
+alpha = Z %*% v_try  
+z_hat = alpha %*% v_try 
+points(z_hat, col='blue', pch=4)
+segments(0, 0, v_try[1], v_try[2], col='red', lwd=4)
+
+
+hist(alpha, 25, xlim=c(-3,3), main=round(var(alpha), 2))
+
+
+```
+
+As we can see above, only about 0.53 people tweeted both about business and computers so its probably best if Nutrient H20 does not create any projects related to the IT industry as there probably won't be a lot of consumers.
+
+
+
+
+
+
+##Q5.
+Loading libraries, reaading in the train and test folders, renaming them and creating corporas.
+```{r,echo=FALSE}
+library(tm) 
+library(tidyverse)
+library(slam)
+library(proxy)
+library(randomForest)
+library(caret)
+
+readerPlain = function(fname){
+  readPlain(elem=list(content=readLines(fname)), 
+            id=fname, language='en') }
+#get all the files in c50train and c50 test
+```
+```{r}
+file_list_train = Sys.glob('STA380/data/ReutersC50/C50train/*/*.txt')
+file_list_test=Sys.glob('STA380/data/ReutersC50/C50test/*/*.txt')
+
+#read them
+train=lapply(file_list_train, readerPlain)
+test=lapply(file_list_test, readerPlain)
+```
+```{r,echo=FALSE}
+trainnames = file_list_train %>%
+  { strsplit(., '/', fixed=TRUE) } %>%
+  { lapply(., tail, n=2) } %>%
+  { lapply(., paste0, collapse = '') } %>%
+  unlist
+testnames=file_list_train %>%
+  { strsplit(., '/', fixed=TRUE) } %>%
+  { lapply(., tail, n=2) } %>%
+  { lapply(., paste0, collapse = '') } %>%
+  unlist
+```
+```{r}
+#rename 
+names(train)=trainnames
+names(test)=testnames
+
+train_raw = Corpus(VectorSource(train))
+test_raw = Corpus(VectorSource(test))
+```
+Filter by making all words lowercase, removing numbers, punction, excess whitespaces and stopwords that end in "en"
+```{r, echo=FALSE}
+train_documents = train_raw %>%
+  tm_map(content_transformer(tolower))  %>%             # 1.make everything lowercase
+  tm_map(content_transformer(removeNumbers)) %>%        # 2.remove numbers
+  tm_map(content_transformer(removePunctuation)) %>%    # 3.remove punctuation
+  tm_map(content_transformer(stripWhitespace))          # 4.remove excess white-space
+
+test_documents = test_raw %>%
+  tm_map(content_transformer(tolower))  %>%             # 1.make everything lowercase
+  tm_map(content_transformer(removeNumbers)) %>%        # 2.remove numbers
+  tm_map(content_transformer(removePunctuation)) %>%    # 3.remove punctuation
+  tm_map(content_transformer(stripWhitespace))          # 4.remove excess white-space
+
+stopwords("en") #5 remove stopwords
+
+train_documents = tm_map(train_documents, content_transformer(removeWords), stopwords("en"))
+test_documents = tm_map(test_documents, content_transformer(removeWords), stopwords("en"))
+```
+Create a doc-term-matrix from the corpus. Finally, the terms that only occur in one or two documents (noise of the 'long tail') which is noise and it doesnt give any useful information. Construct TF IDF weights and change it into matrix format.
+```{r, echo = FALSE}
+DTM_train = DocumentTermMatrix(train_documents)
+DTM_test = DocumentTermMatrix(test_documents)
+DTM_train = removeSparseTerms(DTM_train, 0.95)
+DTM_test = removeSparseTerms(DTM_test, 0.95)
+
+tfidf_train = weightTfIdf(DTM_train)
+tfidf_test = weightTfIdf(DTM_test)
+
+trainmatrix=as.matrix(tfidf_train)
+
+
+name_train<-regmatches(trainnames, regexpr("[[:alpha:]]+", trainnames))
+rownames(trainmatrix)<-name_train
+
+testmatrix=as.matrix(tfidf_test)
+name_test<-regmatches(testnames, regexpr("[[:alpha:]]+", testnames))
+rownames(testmatrix)<-name_test
+
+#PCA and Random ForesT
+
+scrub_cols = which(colSums(trainmatrix) == 0)
+trainmatrix = trainmatrix[,-scrub_cols]
+
+newwords= setdiff(colnames(testmatrix),colnames(trainmatrix))
+newmatrix<-matrix(runif(2500*90, 0.0, 0.01), nrow=2500, ncol=length(newwords))
+colnames(newmatrix)<-newwords
+
+trainmatrix<-cbind(trainmatrix,newmatrix)
+
+newwords<-setdiff(colnames(trainmatrix), colnames(testmatrix))
+newmatrix<-matrix(runif(2500*59, 0.0, 0.01), nrow=2500, ncol=length(newwords))
+colnames(newmatrix)<-newwords
+
+testmatrix<-cbind(testmatrix, newmatrix)
+
+## PCA analysis
+pca_train = prcomp(trainmatrix, scale=TRUE)
+
+pca_train$rotation[order(abs(pca_train$rotation[,1]),decreasing=TRUE),1][1:25]
+pca_train$rotation[order(abs(pca_train$rotation[,2]),decreasing=TRUE),2][1:25]
+
+
+pca_train$x[,1:2]
+
+plot(pca_train$x[,1:2], xlab="PCA 1 direction", ylab="PCA 2 direction", bty="n",
+     type='n')
+text(pca_train$x[,1:2], labels = 1:length(simon), cex=0.7)
+
+## apply PCA analysis from train set on the test set
+pca_test=predict(pca_train, testmatrix)
+
+train_df = data.frame(pca_train$x,name_train)
+test_df= data.frame(pca_test, name_test)
+
+var <- paste("PC", 1:70, sep="")
+fmla <- as.formula(paste("as.factor(name_train) ~ ", paste(var, collapse= "+")))
+
+forest_coast = randomForest(fmla,
+                            data = train_df, ntree=500)
+prediction=predict(forest_coast, test_df)
+```
+Accuracy
+```{r}
+postResample(prediction, as.factor(test_df$name_test))
+```
+
+## Association rule mining
+
+Loading in and inspecting the data
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(arules)
+library(arulesViz)
+grocery <- read.transactions('https://raw.githubusercontent.com/jgscott/STA380/master/data/groceries.txt', sep=',')
+```
+```{r}
+summary(grocery)
+inspect(grocery[1:10])
+```
+Using arulesViz to examine the different levels of confidence and support determine effectiveness.
+```{r, echo=FALSE}
+itemset <- apriori(grocery, parameter=list(support=0.01, confidence=0.25))
+itemset2 <- apriori(grocery, parameter=list(support=0.005, confidence=0.75))
+inspect(itemset)
+inspect(itemset2)
+```
+I used 'sort' so I could plot only the top 10 results based on their confidence or lift.
+
+```{r, echo=FALSE}
+itemset_sorted <- sort(itemset, by='confidence', decreasing=TRUE)
+```
+```{r}
+plotly_arules(itemset)
+```
+```{r pressure, echo=FALSE}
+itemset_II <- head(sort(itemset, by='lift'),10)
+```
+```{r}
+plot(itemset_II, method='matrix')
+plot(itemset_II, method='graph') 
+```
+The plot below lets see the itemsets with high degrees of confidence and lift values.
+```{r, echo=FALSE}
+itemset_cfd <- sort(itemset, by='confidence', decreasing=TRUE)
+itemset_lift <- sort(itemset, by='lift', decreasing=TRUE)
+```
+```{r}
+inspect(head(itemset_cfd))
+inspect(head(itemset_lift))
+```
+From the inspection below, I can see a decent amount of different options that indicated that 'citrus fruit' should be included in the basket. 
+```{r}
+itemset = apriori(data=grocery, parameter=list(supp=0.001, conf=0.09), appearance = list(default = 'lhs', rhs = 'citrus fruit'), control=list(verbose=F))
+itemset = sort(itemset, decreasing=TRUE, by='confidence')
+```
+```{r}
+inspect(itemset[1:10])
+```
+Setting lhs as 'citrus fruit' showed a decent connection which means it might not have given us any new information as it showed up in 13 out of 40 baskets.
+```{r}
+itemset2 <- apriori(data=grocery, parameter=list(supp=0.01, conf=0.05), appearance = list(default = 'rhs', lhs = 'citrus fruit'), control=list(verbose=F))
+itemset2 <- sort(itemset2, by='confidence', decreasing=TRUE)
+```
+```{r}
+inspect(itemset2)
+```
+For this analysis, I conducted tests for different values and combinations for support and confidence, and decided on these parameters. I chose these parameters because I wanted to capture that the quatiles looked like at 25% and 75%. To be time efficient, I set the support at 0.01 as it predicted the items that occurred the most and tested a support for 0.005 with a higher confidence of 0.75 to pick up items I may have left out.
+  
+I found that the discovered item sets make sense because they have a connection and are repeated often. An association analysis was run at different of confidence and support levels, as citrus fruit had high rhs at all levels when sorted by confidence and lift but as the only item as lhs, it doesn't tell us much. 
+
+In summary, Similar and simpler items should be placed together or close to each other because this makes it easier for the customer and could possibly increase revenue because they would have an incentive to return.
